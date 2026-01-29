@@ -1,25 +1,79 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import StatsCard from './StatsCard';
 import EventLog from './EventLog';
 
 const Dashboard = () => {
-  // Mock data
-  const [latestDistance, setLatestDistance] = useState(23);
-  const [totalIncidents, setTotalIncidents] = useState(20);
+  const [latestDistance, setLatestDistance] = useState(0);
+  const [totalIncidents, setTotalIncidents] = useState(0);
   const [systemStatus, setSystemStatus] = useState('online');
-  const [events, setEvents] = useState([
-    { id: 200, sensorType: 'ultrasonic', distance: 23, timestamp: 'Jan 29, 2026 - 9:48:32 AM' },
-    { id: 199, sensorType: 'ultrasonic', distance: 13, timestamp: 'Jan 29, 2026 - 9:48:29 AM' },
-    { id: 198, sensorType: 'ultrasonic', distance: 13, timestamp: 'Jan 29, 2026 - 9:48:10 AM' },
-    { id: 197, sensorType: 'ultrasonic', distance: 22, timestamp: 'Jan 29, 2026 - 9:03:56 AM' },
-    { id: 196, sensorType: 'ultrasonic', distance: 28, timestamp: 'Jan 29, 2026 - 9:03:54 AM' },
-    { id: 195, sensorType: 'ultrasonic', distance: 6, timestamp: 'Jan 29, 2026 - 9:03:48 AM' },
-    { id: 194, sensorType: 'ultrasonic', distance: 5, timestamp: 'Jan 29, 2026 - 8:57:03 AM' },
-  ]);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // API base URL - change this everytime you restart the Codespace
+  const API_BASE_URL = 'https://reimagined-space-potato-5gq67qqxrvp426vg-8000.app.github.dev/api';
+
+  // Fetch stats and detections
+  const fetchData = async () => {
+    try {
+      // Fetch stats
+      const statsResponse = await fetch(`${API_BASE_URL}/stats/`);
+      const statsData = await statsResponse.json();
+      
+      setTotalIncidents(statsData.total_incidents);
+      setLatestDistance(statsData.latest_distance);
+
+      // Fetch detections
+      const detectionsResponse = await fetch(`${API_BASE_URL}/detections/`);
+      const detectionsData = await detectionsResponse.json();
+      
+      // Transform data to match our component format
+      const formattedEvents = detectionsData.map(detection => ({
+        id: detection.id,
+        sensorType: detection.sensor_type,
+        distance: detection.distance,
+        timestamp: new Date(detection.timestamp).toLocaleString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        })
+      }));
+
+      setEvents(formattedEvents);
+      setLoading(false);
+      setSystemStatus('online');
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setSystemStatus('offline');
+      setLoading(false);
+    }
+  };
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchData();
+    
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(fetchData, 5000);
+    
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, []);
 
   // Determine alert level for the main card logic
   const isCritical = latestDistance <= 10;
   const isWarning = latestDistance > 10 && latestDistance <= 20;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#11001C] flex items-center justify-center">
+        <div className="text-xl text-gray-300">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#11001C] font-sans text-gray-100">

@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  #CORS
+    'corsheaders.middleware.CorsMiddleware',  
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -121,9 +121,11 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 # CORS Settings - Allow frontend to connect
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
+# Also add this if not already there:
+ALLOWED_HOSTS = ['*']  # Allow all hosts (for development)
 
 # REST Framework Settings
 REST_FRAMEWORK = {

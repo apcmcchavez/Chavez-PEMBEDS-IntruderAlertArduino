@@ -38,9 +38,6 @@ const EventLog = ({ events }) => {
       
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-[#3A025B]">
-          {/* UPDATED HERE: 
-              Changed bg from #1A0129 to #3A025B (Russian Violet) 
-          */}
           <thead className="bg-[#3A025B]">
             <tr>
               {['Log ID', 'Sensor Type', 'Distance', 'Time Detected'].map((head) => (
