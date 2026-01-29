@@ -1,13 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import StatsCard from './StatsCard';
 import EventLog from './EventLog';
 
 const Dashboard = () => {
-  // Mock data - we'll replace this with real API calls later
+  // Mock data
   const [latestDistance, setLatestDistance] = useState(23);
   const [totalIncidents, setTotalIncidents] = useState(20);
   const [systemStatus, setSystemStatus] = useState('online');
-  
   const [events, setEvents] = useState([
     { id: 200, sensorType: 'ultrasonic', distance: 23, timestamp: 'Jan 29, 2026 - 9:48:32 AM' },
     { id: 199, sensorType: 'ultrasonic', distance: 13, timestamp: 'Jan 29, 2026 - 9:48:29 AM' },
@@ -18,28 +17,35 @@ const Dashboard = () => {
     { id: 194, sensorType: 'ultrasonic', distance: 5, timestamp: 'Jan 29, 2026 - 8:57:03 AM' },
   ]);
 
+  // Determine alert level for the main card logic
+  const isCritical = latestDistance <= 10;
+  const isWarning = latestDistance > 10 && latestDistance <= 20;
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-[#11001C] font-sans text-gray-100">
+      
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-[#220135] shadow-lg border-b border-[#3A025B]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="bg-blue-500 rounded-lg p-2">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
+              <div className="bg-[#520380] rounded-lg p-2 shadow-[0_0_10px_rgba(82,3,128,0.5)]">
+                <div className="bg-[#520380] rounded-lg p-2 shadow-[0_0_10px_rgba(82,3,128,0.5)]">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h1m5 0h1" />
+                  </svg>
+                </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Silent Sentry Dashboard</h1>
-                <p className="text-sm text-gray-500">Real-time Intruder Monitoring System</p>
+                <h1 className="text-2xl font-bold text-white tracking-wide">Simple Intruder Alert - Movement Scanner</h1>
+                <p className="text-xs text-gray-400 uppercase tracking-widest">Chavez PEMBEDS Project</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <span className={`h-3 w-3 rounded-full ${systemStatus === 'online' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></span>
-              <span className="text-sm font-medium text-gray-700">
-                System {systemStatus === 'online' ? 'Online' : 'Offline'}
+            
+            <div className="flex items-center space-x-2 bg-[#1A0129] px-3 py-1 rounded-full border border-[#3A025B]">
+              <span className={`h-2 w-2 rounded-full ${systemStatus === 'online' ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-red-500'} animate-pulse`}></span>
+              <span className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+                {systemStatus === 'online' ? 'System Online' : 'Offline'}
               </span>
             </div>
           </div>
@@ -48,23 +54,30 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          
+          {/* LATEST DETECTION - LEANING BLUE */}
           <StatsCard 
             title="Latest Detection" 
             value={latestDistance} 
             unit="cm away"
-            bgColor="bg-blue-50"
-            textColor="text-blue-600"
-            borderColor="border-blue-500"
+            iconType={isCritical ? 'danger' : isWarning ? 'warning' : 'safe'}
+            bgColor={isCritical ? "bg-[#2e0a0a]" : "bg-[#1e1b4b]"} 
+            borderColor={isCritical ? "border-red-500 animate-pulse" : isWarning ? "border-yellow-400" : "border-indigo-500"}
+            textColor={isCritical ? "text-red-400" : isWarning ? "text-yellow-400" : "text-indigo-300"}
           />
+      
+          {/* TOTAL INCIDENTS - LEANING RED */}
           <StatsCard 
             title="Total Incidents" 
             value={totalIncidents} 
             unit="logged (Recent)"
-            bgColor="bg-red-50"
-            textColor="text-red-600"
-            borderColor="border-red-500"
+            iconType="info"
+            bgColor="bg-[#2e0219]" 
+            borderColor="border-pink-900"
+            textColor="text-pink-300"
           />
         </div>
 
