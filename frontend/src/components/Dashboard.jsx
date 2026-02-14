@@ -9,8 +9,9 @@ const Dashboard = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // API base URL - Updated to your live PythonAnywhere backend
-  const API_BASE_URL = 'https://apcmcchavez.pythonanywhere.com/api';
+  // ⚠️ REPLACE '192.168.X.X' with your actual IP address!
+  // ⚠️ NOTE: Use 'http', NOT 'https' for local testing.
+  const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
   // Fetch stats and detections
   const fetchData = async () => {
@@ -54,7 +55,9 @@ const Dashboard = () => {
 
   // Fetch data on component mount
   useEffect(() => {
-    fetchData();
+    (async () => {
+      await fetchData();
+    })();
     
     // Auto-refresh every 5 seconds
     const interval = setInterval(fetchData, 5000);
